@@ -30,6 +30,11 @@ _DPC_CODES = [
 _ICD_CODES = ["C71", "I63", "J18", "J69", "I20", "C15", "K80", "E86", "N39", "S72"]
 
 
+def _parse_ym_to_date(ym: str) -> date:
+    """YYYYMM文字列を月初のdateに変換する."""
+    return date(int(ym[:4]), int(ym[4:6]), 1)
+
+
 def generate_episodes(ctx: GenerationContext) -> None:
     """入院エピソードと転棟イベントを生成し、コンテキストに設定する."""
     assert ctx.facility is not None
@@ -40,15 +45,28 @@ def generate_episodes(ctx: GenerationContext) -> None:
     episodes: list[AdmissionEpisode] = []
     transfers: list[TransferEvent] = []
 
-    ym = ctx.config.target_year_month
-    year = int(ym[:4])
-    month = int(ym[4:6])
-    month_start = date(year, month, 1)
+    cfg = ctx.config
+
+    # 入院期間の決定
+    if cfg.admission_start and cfg.admission_end:
+        range_start = _parse_ym_to_date(cfg.admission_start)
+        range_end = _parse_ym_to_date(cfg.admission_end)
+        # range_endの月末まで含む
+        if range_end.month == 12:
+            range_end_last = date(range_end.year + 1, 1, 1) - timedelta(days=1)
+        else:
+            range_end_last = date(range_end.year, range_end.month + 1, 1) - timedelta(days=1)
+        total_days = (range_end_last - range_start).days
+    else:
+        ym = cfg.target_year_month
+        range_start = _parse_ym_to_date(ym) - timedelta(days=15)
+        total_days = 35
+        range_end_last = range_start + timedelta(days=total_days)
 
     for i, patient in enumerate(ctx.patients):
-        # 入院日: 対象月の前月〜対象月内
-        offset = rng.randint(-15, 20)
-        admission_date = month_start + timedelta(days=offset)
+        # 入院日: 期間内のランダムな日
+        offset = rng.randint(0, max(0, total_days - 1))
+        admission_date = range_start + timedelta(days=offset)
 
         # 在院日数: 3〜30日
         los = rng.randint(3, 30)
@@ -87,7 +105,7 @@ def generate_episodes(ctx: GenerationContext) -> None:
         if los >= 7 and rng.random() < 0.3 and len(ctx.wards) >= 2:
             transfer_day = rng.randint(2, los - 2)
             from_ward = ctx.wards[0]
-            to_ward = ctx.wards[1] if len(ctx.wards) > 1 else ctx.wards[0]
+            to_ward = rng.choice(ctx.wards[1:])
             transfers.append(
                 TransferEvent(
                     episode_id=episode_id,

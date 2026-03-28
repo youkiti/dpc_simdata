@@ -54,6 +54,8 @@ def main(argv: list[str] | None = None) -> int:
         default="dpc_target",
         help="施設種別",
     )
+    parser.add_argument("--admission-start", type=str, default="", help="入院期間の開始年月（YYYYMM）")
+    parser.add_argument("--admission-end", type=str, default="", help="入院期間の終了年月（YYYYMM）")
     parser.add_argument("--validate", action="store_true", help="生成後に参照整合性を検証する")
 
     args = parser.parse_args(argv)
@@ -65,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
         num_wards=args.num_wards,
         output_dir=args.output_dir,
         facility_type=FacilityType(args.facility_type),
+        admission_start=args.admission_start,
+        admission_end=args.admission_end,
     )
 
     pipeline = build_pipeline()

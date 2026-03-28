@@ -25,6 +25,8 @@ class GenerationConfig:
     num_wards: int = 3
     output_dir: Path = field(default_factory=lambda: Path("output"))
     facility_type: FacilityType = FacilityType.DPC_TARGET
+    admission_start: str = ""  # YYYYMM（空の場合はtarget_year_monthを使用）
+    admission_end: str = ""  # YYYYMM（空の場合はtarget_year_monthを使用）
 
 
 @dataclass
