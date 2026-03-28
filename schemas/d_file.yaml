@@ -1,0 +1,114 @@
+# Dファイル スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 月次・レセプト単位
+# 対象: DPC対象病院のみ
+
+dataset: d_file
+description: 包括評価点数・係数・出来高理由コード等
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: レセプト
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: claim_line.claim_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 統合番号（匿名化ID）
+
+  - name: episode_id
+    position: 4
+    type: string
+    width: 20
+    required: true
+    source: admission_episode.episode_id
+    description: 入院エピソードID
+
+  - name: dpc_code
+    position: 5
+    type: string
+    width: 14
+    required: true
+    pattern: "^.{14}$"
+    source: admission_episode.dpc_code
+    description: 診断群分類番号（14桁）
+
+  - name: admission_date
+    position: 6
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.admission_date
+    description: 入院日（YYYYMMDD）
+
+  - name: discharge_date
+    position: 7
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.discharge_date
+    description: 退院日（YYYYMMDD）
+
+  - name: inclusive_tensu
+    position: 8
+    type: integer
+    width: 8
+    required: true
+    source: computed.inclusive_tensu
+    description: 包括評価点数（日額）
+
+  - name: los_days
+    position: 9
+    type: integer
+    width: 5
+    required: true
+    source: computed.los_days
+    description: 在院日数
+
+  - name: medical_institution_coefficient
+    position: 10
+    type: decimal
+    width: 10
+    required: true
+    source: computed.coefficient
+    description: 医療機関別係数
+
+  - name: fee_for_service_reason
+    position: 11
+    type: string
+    width: 2
+    required: false
+    code_system: ffs_reason
+    source: computed.ffs_reason
+    description: 出来高算定理由コード
+
+  - name: total_inclusive_tensu
+    position: 12
+    type: integer
+    width: 10
+    required: true
+    source: computed.total_inclusive_tensu
+    description: 包括合計点数

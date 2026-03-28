@@ -1,0 +1,268 @@
+# 様式1 スキーマ定義（主要項目）
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 患者・退院（または転棟）単位
+
+dataset: form1
+description: 患者属性・病態・診断・手術・転帰等
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 退院
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 統合番号（匿名化ID）
+
+  - name: episode_id
+    position: 4
+    type: string
+    width: 20
+    required: true
+    source: admission_episode.episode_id
+    description: 入院エピソードID
+
+  - name: sex
+    position: 5
+    type: string
+    width: 1
+    required: true
+    code_system: sex
+    source: patient.sex
+    description: 性別（1=男, 2=女）
+
+  - name: birth_date
+    position: 6
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: patient.birth_date
+    description: 生年月日（YYYYMMDD）
+
+  - name: postal_code
+    position: 7
+    type: string
+    width: 7
+    required: false
+    pattern: "^\\d{7}$"
+    source: patient.postal_code
+    description: 郵便番号
+
+  - name: admission_date
+    position: 8
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.admission_date
+    description: 入院日（YYYYMMDD）
+
+  - name: discharge_date
+    position: 9
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.discharge_date
+    description: 退院日（YYYYMMDD）
+
+  - name: discharge_status
+    position: 10
+    type: string
+    width: 2
+    required: true
+    code_system: discharge_status
+    source: admission_episode.discharge_status
+    description: 退院先コード
+
+  - name: admission_route
+    position: 11
+    type: string
+    width: 2
+    required: true
+    code_system: admission_route
+    source: admission_episode.admission_route
+    description: 入院経路コード
+
+  - name: payer_type
+    position: 12
+    type: string
+    width: 2
+    required: true
+    code_system: payer_type
+    source: admission_episode.payer_type
+    description: 保険種別コード
+
+  - name: dpc_code
+    position: 13
+    type: string
+    width: 14
+    required: false
+    pattern: "^.{14}$"
+    source: admission_episode.dpc_code
+    description: 診断群分類番号（14桁）
+
+  - name: main_diagnosis_icd
+    position: 14
+    type: string
+    width: 7
+    required: true
+    code_system: icd10
+    source: admission_episode.main_diagnosis_icd
+    description: 主傷病ICDコード
+
+  - name: main_diagnosis_name
+    position: 15
+    type: string
+    width: 200
+    required: true
+    source: diagnosis.diagnosis_name
+    description: 主傷病名
+
+  - name: trigger_icd
+    position: 16
+    type: string
+    width: 7
+    required: true
+    code_system: icd10
+    source: diagnosis.icd_code
+    description: 入院の契機となった傷病ICDコード
+
+  - name: trigger_diagnosis_name
+    position: 17
+    type: string
+    width: 200
+    required: true
+    source: diagnosis.diagnosis_name
+    description: 入院の契機となった傷病名
+
+  - name: secondary_diagnosis_1_icd
+    position: 18
+    type: string
+    width: 7
+    required: false
+    code_system: icd10
+    source: diagnosis.icd_code
+    description: 医療資源を2番目に投入した傷病ICDコード
+
+  - name: secondary_diagnosis_1_name
+    position: 19
+    type: string
+    width: 200
+    required: false
+    source: diagnosis.diagnosis_name
+    description: 医療資源を2番目に投入した傷病名
+
+  - name: num_transfer
+    position: 20
+    type: integer
+    width: 2
+    required: true
+    source: transfer_event.count
+    description: 転棟回数
+
+  - name: ward_code_admission
+    position: 21
+    type: string
+    width: 10
+    required: true
+    source: ward.ward_code
+    description: 入院時病棟コード
+
+  - name: los_days
+    position: 22
+    type: integer
+    width: 5
+    required: true
+    source: computed.los_days
+    description: 在院日数
+
+  - name: procedure_1_code
+    position: 23
+    type: string
+    width: 10
+    required: false
+    source: procedure.procedure_code
+    description: 手術1コード
+
+  - name: procedure_1_name
+    position: 24
+    type: string
+    width: 200
+    required: false
+    source: procedure.procedure_name
+    description: 手術1名称
+
+  - name: procedure_1_date
+    position: 25
+    type: date
+    width: 8
+    required: false
+    pattern: "^\\d{8}$"
+    source: procedure.procedure_date
+    description: 手術1実施日（YYYYMMDD）
+
+  - name: facility_type
+    position: 26
+    type: string
+    width: 2
+    required: true
+    code_system: facility_type
+    source: facility.facility_type
+    description: 施設種別コード
+
+  - name: prefecture_code
+    position: 27
+    type: string
+    width: 2
+    required: true
+    pattern: "^\\d{2}$"
+    source: facility.prefecture_code
+    description: 都道府県コード
+
+  - name: total_bed_count
+    position: 28
+    type: integer
+    width: 5
+    required: true
+    source: facility.bed_count
+    description: 施設全体の許可病床数
+
+  - name: insurer_number
+    position: 29
+    type: string
+    width: 8
+    required: false
+    source: payer_context.insurer_number
+    description: 保険者番号
+
+  - name: age_at_admission
+    position: 30
+    type: integer
+    width: 3
+    required: true
+    source: computed.age_at_admission
+    description: 入院時年齢

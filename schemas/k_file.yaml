@@ -1,0 +1,74 @@
+# Kファイル スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 月次・患者単位
+# 対象: ef_inpatientに含まれる症例に限る
+# 備考: 一次共通IDの厳密な生成仕様は「支援ツールで自動作成」とされており、
+#       現時点ではダミー値で構造のみ先行する
+
+dataset: k_file
+description: 一次共通ID（生年月日・カナ氏名・性別から作成）
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 患者
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 統合番号（匿名化ID）
+
+  - name: birth_date
+    position: 4
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: patient.birth_date
+    description: 生年月日（YYYYMMDD）
+
+  - name: sex
+    position: 5
+    type: string
+    width: 1
+    required: true
+    code_system: sex
+    source: patient.sex
+    description: 性別（1=男, 2=女）
+
+  - name: kana_name
+    position: 6
+    type: string
+    width: 100
+    required: true
+    source: patient.kana_name
+    description: カナ氏名
+
+  - name: primary_common_id
+    position: 7
+    type: string
+    width: 64
+    required: true
+    source: computed.primary_common_id
+    description: 一次共通ID（ダミー値、支援ツール依存）

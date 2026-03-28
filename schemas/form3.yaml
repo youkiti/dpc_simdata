@@ -1,0 +1,96 @@
+# 様式3 スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 医療機関・病棟単位（1病棟1レコード）
+
+dataset: form3
+description: 施設情報（病棟ごとの病床数・入院基本料等）
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 病棟
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: 調査対象年月（YYYYMM）
+
+  - name: ward_code
+    position: 3
+    type: string
+    width: 10
+    required: true
+    source: ward.ward_code
+    description: 病棟コード
+
+  - name: ward_name
+    position: 4
+    type: string
+    width: 100
+    required: true
+    source: ward.ward_name
+    description: 病棟名称
+
+  - name: bed_count
+    position: 5
+    type: integer
+    width: 5
+    required: true
+    source: ward.bed_count
+    description: 許可病床数
+
+  - name: ward_type
+    position: 6
+    type: string
+    width: 2
+    required: true
+    code_system: ward_type
+    source: ward.ward_type
+    description: 病棟種別コード
+
+  - name: nursing_grade
+    position: 7
+    type: string
+    width: 30
+    required: true
+    source: ward.nursing_grade
+    description: 入院基本料等の区分
+
+  - name: facility_type
+    position: 8
+    type: string
+    width: 2
+    required: true
+    code_system: facility_type
+    source: facility.facility_type
+    description: 施設種別コード
+
+  - name: total_bed_count
+    position: 9
+    type: integer
+    width: 5
+    required: true
+    source: facility.bed_count
+    description: 施設全体の許可病床数
+
+  - name: prefecture_code
+    position: 10
+    type: string
+    width: 2
+    required: true
+    pattern: "^\\d{2}$"
+    source: facility.prefecture_code
+    description: 都道府県コード

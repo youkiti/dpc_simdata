@@ -1,0 +1,87 @@
+# Hファイル スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 月次・患者日単位
+# 重症度、医療・看護必要度の評価項目
+
+dataset: h_file
+description: 重症度、医療・看護必要度の日次評価データ
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 患者日
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 統合番号（匿名化ID）
+
+  - name: episode_id
+    position: 4
+    type: string
+    width: 20
+    required: true
+    source: admission_episode.episode_id
+    description: 入院エピソードID
+
+  - name: status_date
+    position: 5
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: daily_status.status_date
+    description: 評価日（YYYYMMDD）
+
+  - name: ward_code
+    position: 6
+    type: string
+    width: 10
+    required: true
+    source: daily_status.ward_code
+    description: 病棟コード
+
+  - name: a_score
+    position: 7
+    type: integer
+    width: 2
+    required: true
+    source: daily_status.nursing_necessity.a_score
+    description: A項目スコア（モニタリング及び処置等）
+
+  - name: b_score
+    position: 8
+    type: integer
+    width: 2
+    required: true
+    source: daily_status.nursing_necessity.b_score
+    description: B項目スコア（患者の状況等）
+
+  - name: c_score
+    position: 9
+    type: integer
+    width: 2
+    required: true
+    source: daily_status.nursing_necessity.c_score
+    description: C項目スコア（手術等の医学的状況）

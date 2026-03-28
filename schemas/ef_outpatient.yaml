@@ -1,0 +1,96 @@
+# 外来EF統合ファイル スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 月次・レセプト明細行単位
+# 対象: 対象施設が限定される（DPC対象病院等）
+
+dataset: ef_outpatient
+description: 外来患者の出来高算定情報と病名情報
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 明細行
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 患者ID
+
+  - name: record_type
+    position: 4
+    type: string
+    width: 2
+    required: true
+    code_system: ef_record_type
+    source: computed.record_type
+    description: レコード種別
+
+  - name: sequence_number
+    position: 5
+    type: integer
+    width: 8
+    required: true
+    source: computed.sequence_number
+    description: 連番
+
+  - name: shinryo_code
+    position: 6
+    type: string
+    width: 9
+    required: true
+    source: claim_line.shinryo_code
+    description: 診療行為コード
+
+  - name: shinryo_name
+    position: 7
+    type: string
+    width: 200
+    required: true
+    source: claim_line.shinryo_name
+    description: 診療行為名称
+
+  - name: tensu
+    position: 8
+    type: integer
+    width: 8
+    required: true
+    source: claim_line.tensu
+    description: 点数
+
+  - name: quantity
+    position: 9
+    type: integer
+    width: 5
+    required: true
+    source: claim_line.quantity
+    description: 回数
+
+  - name: visit_date
+    position: 10
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: computed.visit_date
+    description: 受診日（YYYYMMDD）

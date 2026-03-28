@@ -1,0 +1,97 @@
+# 様式4 スキーマ定義
+# 基準: 2025-05-30版 実施説明資料
+# 単位: 退院単位
+# 対象: 医科保険以外の入院も含む（自費、健診、労災等）
+
+dataset: form4
+description: 医科保険以外の診療情報の有無
+format: csv
+delimiter: ","
+encoding: shift_jis
+record_unit: 退院
+
+fields:
+  - name: facility_code
+    position: 1
+    type: string
+    width: 10
+    required: true
+    pattern: "^\\d{10}$"
+    source: facility.facility_code
+    description: 医療機関コード
+
+  - name: year_month
+    position: 2
+    type: string
+    width: 6
+    required: true
+    pattern: "^\\d{6}$"
+    source: config.target_year_month
+    description: データ対象年月（YYYYMM）
+
+  - name: patient_id
+    position: 3
+    type: string
+    width: 20
+    required: true
+    source: patient.patient_id
+    description: 統合番号（匿名化ID）
+
+  - name: episode_id
+    position: 4
+    type: string
+    width: 20
+    required: true
+    source: admission_episode.episode_id
+    description: 入院エピソードID
+
+  - name: admission_date
+    position: 5
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.admission_date
+    description: 入院日（YYYYMMDD）
+
+  - name: discharge_date
+    position: 6
+    type: date
+    width: 8
+    required: true
+    pattern: "^\\d{8}$"
+    source: admission_episode.discharge_date
+    description: 退院日（YYYYMMDD）
+
+  - name: payer_type
+    position: 7
+    type: string
+    width: 2
+    required: true
+    code_system: payer_type
+    source: admission_episode.payer_type
+    description: 保険種別コード
+
+  - name: has_non_medical_insurance
+    position: 8
+    type: string
+    width: 1
+    required: true
+    source: computed.has_non_medical_insurance
+    description: 医科保険以外の有無（1=有, 0=無）
+
+  - name: self_pay_flag
+    position: 9
+    type: string
+    width: 1
+    required: true
+    source: computed.self_pay_flag
+    description: 自費の有無（1=有, 0=無）
+
+  - name: workers_comp_flag
+    position: 10
+    type: string
+    width: 1
+    required: true
+    source: computed.workers_comp_flag
+    description: 労災の有無（1=有, 0=無）
